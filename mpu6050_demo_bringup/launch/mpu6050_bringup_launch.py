@@ -1,7 +1,7 @@
 import os
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command
 
@@ -25,6 +25,9 @@ def generate_launch_description():
             executable='ros2_control_node',
             parameters=[{'robot_description': robot_description},
                         controller_params_file])
+    
+    # Delayed controller manager action   
+    start_delayed_controller_manager = TimerAction(period=1.0, actions=[controller_manager_node])
 
     # Spawn joint_state_broadcaser
     joint_state_broadcaster_spawner= Node(
@@ -40,7 +43,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         robot_state_publisher_cmd,
-        controller_manager_node,
+        start_delayed_controller_manager,
         joint_state_broadcaster_spawner,
         imu_broadcaster_spawner
     ])
